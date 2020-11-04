@@ -1,24 +1,17 @@
 <!-- Use preprocessors via the lang attribute! e.g. <template lang="pug"> -->
 <template>
   <div id="app">
-    <p>
-      Learn more with the
-      <a
-        href="https://vuejs.org/"
-        target="_blank"
-        rel="noopener"
-      >Vue Docs &amp; Resources</a>.
-    </p>
     <div class="view">
       <p>test</p>
+      <chartxkcd-pie :config="config" class="view"></chartxkcd-pie>
       <chartxkcd-line :config="config" class="view"></chartxkcd-line>
     </div>
-    <button @click="doSomething">Say hello.</button>
+    <button @click="changeData">Say hello.</button>
   </div>
 </template>
 
 <script>
-import { chartXKCDLine } from 'chart.xkcd-vue'
+import { chartXKCDLine, chartXKCDPie } from 'chart.xkcd-vue'
 
  export default {
    name: 'app',
@@ -38,6 +31,10 @@ import { chartXKCDLine } from 'chart.xkcd-vue'
              {
                label: 'Reality',
                data: [0, 1, 30, 70, 80, 100, 50, 80, 40, 150]
+             },
+             {
+               label: 'Test #1',
+               data: [] //[2124, 2245, 1112, 2270, 2280, 3356, 4140, 2380, 3200, 2125]
              }
            ]
          }
@@ -45,7 +42,25 @@ import { chartXKCDLine } from 'chart.xkcd-vue'
      }
    },
    components: {
-     'chartxkcd-line': chartXKCDLine
+     'chartxkcd-line': chartXKCDLine,
+     'chartxkcd-pie': chartXKCDPie
+   },
+   methods: {
+     changeData () {
+       for(let i=0; i<this.config.data.datasets[0].data.length; i++) {
+         this.config.data.datasets[2].data.push(Math.floor(Math.random()*1000+2000))
+         console.log(this.config.data.datasets[0].data[i])
+       }
+     },
+     dupd(i,d) {
+       this.$set(this.config.data.datasets[0].data, i, d)
+     }
+   },
+   created() {
+     this.changeData()
+   },
+   updated() {
+     this.changeData()
    }
  }
 </script>
