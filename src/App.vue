@@ -1,15 +1,20 @@
 <!-- Use preprocessors via the lang attribute! e.g. <template lang="pug"> -->
 <template>
   <div id="app">
-    <div class="view">
-      <p>test</p>
-      <chartxkcd-line :config="config" class="view"></chartxkcd-line>
-    </div>
+
+    <ul>
+      <li v-for="(c, k) in countries"
+        :key="k">
+        <button @click="sel=c.id">{{c.id}}|{{c.country}}</button>
+      </li>
+    </ul>
+    <Cartbox :title="countries[sel].country" :dataset="countries[sel].data"/>
     <button>Say hello.</button>
+    <p>{{sel}}</p>
   </div>
 </template>
 <script>
-import { chartXKCDLine } from 'chart.xkcd-vue'
+import Cartbox from '@/components/Cartbox.vue'
 
  export default {
    name: 'app',
@@ -17,32 +22,12 @@ import { chartXKCDLine } from 'chart.xkcd-vue'
      return {
        dt: {},
        blr: [],
-       config: {
-         title: 'Covid 19 | Belarus',
-         xLabel: 'Date',
-         yLabel: 'Mens',
-         data: {
-           labels: [],
-           datasets: [
-             {
-               label: 'Plan',
-               data: []
-             },
-             {
-               label: 'Reality',
-               data: []
-             },
-             {
-               label: 'Test #1',
-               data: [] //[2124, 2245, 1112, 2270, 2280, 3356, 4140, 2380, 3200, 2125]
-             }
-           ]
-         }
-       }
+       sel: 12,
+       countries: []
      }
    },
    components: {
-     'chartxkcd-line': chartXKCDLine
+     Cartbox
    },
    methods: {
      changeData () {
@@ -50,24 +35,13 @@ import { chartXKCDLine } from 'chart.xkcd-vue'
       //posts list
       xhr.open("GET", "https://pomber.github.io/covid19/timeseries.json", false);
       xhr.send();
-
       this.dt =  window.JSON.parse(xhr.responseText);
-      this.blr  = this.dt.Belarus;
-      this.config.data.datasets[0].label = 'Confirmed';
-      this.config.data.datasets[1].label = 'Deaths';
-      this.config.data.datasets[2].label = 'Recovered';
-      for(let i=0; i<this.blr.length; i++) {
-         if(this.blr[i].deaths>0) {
-           this.config.data.labels.push(this.blr[i].date);
-           this.config.data.datasets[0].data.push(this.blr[i].confirmed);
-           this.config.data.datasets[1].data.push(this.blr[i].deaths);
-           this.config.data.datasets[2].data.push(this.blr[i].recovered);
-         }
-      }/*
-      for(let i=30; i<this.blr.length; i+=2) {
-        this.config.data.labels.push(this.blr[i].date);
-      }*/
-     }
+      let i=0;
+      for (let [key, val] of Object.entries(this.dt)) {
+        this.countries.push({id: i, country: key, data: val});
+        i++;
+      }
+    }
    },
    created() {
      this.changeData()
@@ -83,14 +57,7 @@ import { chartXKCDLine } from 'chart.xkcd-vue'
   color: #2c3e50;
   margin-top: 60px;
 }
-.view {
-   width: 600px;
-   height: 800px;
-}
 
-.tick text {
-  opacity: 0;
-}
 
 a,
 button {
